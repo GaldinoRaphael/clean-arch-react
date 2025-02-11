@@ -4,12 +4,13 @@ import { Fieldset } from "../Fieldset";
 import { FormLabel } from "../FormLabel";
 import { TextField } from "../TextField";
 import { Figure, Form, FormActions, Heading, Image } from "../Form";
+import { CreateUser } from "../../domain/useCases/CreateUser";
+import { UserSupabaseRepository } from "../../infra/supabase/UserSupabaseRepository";
+import { toast } from "react-toastify";
 
-interface FormRegisterProps {
-    onRegister: (user: { name: string, email: string, password: string }) => void
-}
+const createUser = new CreateUser(new UserSupabaseRepository());
 
-export const FormRegister = ({ onRegister }: FormRegisterProps) => {
+export const FormRegister = () => {
     const [user, setUser] = useState({ name: '', email: '', password: '' });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,8 +23,13 @@ export const FormRegister = ({ onRegister }: FormRegisterProps) => {
 
     const registerUser = (evt: React.FormEvent<HTMLFormElement>) => {
         evt.preventDefault();
-        console.log(user);
-        onRegister(user)
+        try {
+            createUser.execute(user);
+            toast.success('Conta criada com sucesso!');
+            setUser({ name: '', email: '', password: '' });
+        } catch (error) {
+            toast.error('Erro ao criar conta!');
+        }
     };
 
     return (
@@ -35,7 +41,7 @@ export const FormRegister = ({ onRegister }: FormRegisterProps) => {
                 <Heading>
                     Cadastro
                 </Heading>
-                <p>Preencha os campos abaixo para<br/>criar sua conta corrente!</p>
+                <p>Preencha os campos abaixo para<br />criar sua conta corrente!</p>
                 <Form onSubmit={registerUser}>
                     <Fieldset>
                         <FormLabel>
