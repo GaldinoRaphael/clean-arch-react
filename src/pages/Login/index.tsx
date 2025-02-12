@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { Button } from "../Button";
-import { Fieldset } from "../Fieldset";
-import { Figure, Form, FormActions, Heading, Image } from "../Form";
-import { FormLabel } from "../FormLabel";
-import { TextField } from "../TextField";
+import { Button } from "../../components/Button";
+import { Fieldset } from "../../components/Fieldset";
+import { Figure, Form, FormActions, Heading, Image } from "../../components/Form";
+import { FormLabel } from "../../components/FormLabel";
+import { TextField } from "../../components/TextField";
+import { useAuthContext } from "../../app/hooks/useAuthContext";
+import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
-interface FormLoginProps {
-    onLogin: () => void
-}
 
-export const FormLogin = ({ onLogin }: FormLoginProps) => {
+export const Login = () => {
     const [credentials, setCredentials] = useState({ email: '', password: '' });
+    const { login } = useAuthContext();
+    const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -22,8 +24,14 @@ export const FormLogin = ({ onLogin }: FormLoginProps) => {
 
     const loginUser = (evt: React.FormEvent<HTMLFormElement>) => {
         evt.preventDefault();
-        console.log(credentials);
-        onLogin()
+        try {
+            login(credentials.email, credentials.password);
+            navigate("/");
+            toast.success('Login realizado com sucesso');
+        }
+        catch (error) {
+            toast.error('Erro ao realizar login');
+        }
     };
 
     return (
