@@ -3,6 +3,10 @@ import { Sidebar } from "../presentation/Sidebar"
 import { TransactionForm } from "../presentation/TransactionForm"
 import { Account } from "../presentation/Account"
 import { Statement } from "../presentation/Statement"
+import { useState, useEffect } from "react"
+import { ITransaction } from "../domain/Entities/ITransaction"
+import { TransactionDatabaseRepository } from "../domain/repositories/TransactionDatabaseRepository"
+import { ListAllTransactions } from "../domain/useCases/ListAllTransactions"
 
 const Main = styled.main`
     flex-grow: 1;
@@ -11,35 +15,19 @@ const Main = styled.main`
     gap: 34px;
 `
 
-const transactions = [
-  {
-    id: 1,
-    value: 150,
-    type: 'Depósito',
-    date: new Date(2022, 9, 18)
-  },
-  {
-    id: 2,
-    value: 200,
-    type: 'Saque',
-    date: new Date(2022, 8, 19)
-  },
-  {
-    id: 3,
-    value: 300,
-    type: 'Transferência',
-    date: new Date(2022, 8, 20)
-  },
-  {
-    id: 4,
-    value: 500,
-    type: 'Depósito',
-    date: new Date(2022, 7, 21)
-  }
-];
 
+
+const transactionRepository = new TransactionDatabaseRepository();
+const listAllTransactions = new ListAllTransactions(transactionRepository);
 
 const Home = () => {
+
+  const [transactions, setTransactions] = useState<ITransaction[]>([])
+  useEffect(() => {
+    listAllTransactions.execute()
+      .then(data => setTransactions(data))
+  }, [])
+
 
   return (
     <>
